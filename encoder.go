@@ -13,6 +13,8 @@ const (
 	ContentJSON = "application/json"
 	// ContentJSONP header value for JSONP data.
 	ContentJSONP = "application/javascript"
+	// ContentText header value for Text data.
+	ContentText = "text/plain"
 	// ContentType header constant.
 	ContentType = "Content-Type"
 	// ContentDefaultCharset default character encoding.
@@ -67,6 +69,17 @@ func (enc *HTTPEncoder) EncodeData(data []byte) error {
 	_, err := enc.writer.Write(data)
 	if err != nil {
 		http.Error(enc.writer, "Unable to encode binary data", http.StatusInternalServerError)
+	}
+	return err
+}
+
+// EncodeText encodes a plain text
+func (enc *HTTPEncoder) EncodeText(text string) error {
+	enc.writer.Header().Set(ContentType, ContentTypeWithCharset(ContentText))
+
+	_, err := fmt.Fprint(enc.writer, text)
+	if err != nil {
+		http.Error(enc.writer, fmt.Sprintf("Unable to encode text '%s'", text), http.StatusInternalServerError)
 	}
 	return err
 }

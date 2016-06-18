@@ -54,7 +54,7 @@ var _ = Describe("HTTPEncoder", func() {
 
 	Describe("EncodeJSONP", func() {
 		It("encodes a json format", func() {
-			model := map[string]string{"name": "root"}
+			model := map[string]string{"name": "Unknown"}
 			Expect(encoder.EncodeJSONP("my_callback", model)).To(Succeed())
 			Expect(recoder.Body.String()).To(Equal("my_callback({\"name\":\"Unknown\"})"))
 		})
@@ -85,6 +85,23 @@ var _ = Describe("HTTPEncoder", func() {
 
 		It("has the correct status code", func() {
 			Expect(encoder.EncodeData([]byte("hello"))).To(Succeed())
+			Expect(recoder.Code).To(Equal(http.StatusOK))
+		})
+	})
+
+	Describe("EncodeText", func() {
+		It("encodes a text", func() {
+			Expect(encoder.EncodeText("hello")).To(Succeed())
+			Expect(recoder.Body.String()).To(Equal("hello"))
+		})
+
+		It("has the corrent content type", func() {
+			Expect(encoder.EncodeText("hello")).To(Succeed())
+			Expect(recoder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"text/plain; charset=UTF-8"}))
+		})
+
+		It("has the correct status code", func() {
+			Expect(encoder.EncodeText("hello")).To(Succeed())
 			Expect(recoder.Code).To(Equal(http.StatusOK))
 		})
 	})
@@ -133,6 +150,17 @@ var _ = Describe("HTTPEncoder", func() {
 
 			It("has correct status code", func() {
 				Expect(encoder.EncodeData([]byte("hello"))).To(MatchError("Oh no!"))
+				Expect(fakeResponseWriter.Code()).To(Equal(http.StatusInternalServerError))
+			})
+		})
+
+		Describe("EncodeText", func() {
+			It("returns the error", func() {
+				Expect(encoder.EncodeText("hello")).To(MatchError("Oh no!"))
+			})
+
+			It("has correct status code", func() {
+				Expect(encoder.EncodeText("hello")).To(MatchError("Oh no!"))
 				Expect(fakeResponseWriter.Code()).To(Equal(http.StatusInternalServerError))
 			})
 		})
