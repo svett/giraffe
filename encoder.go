@@ -9,6 +9,8 @@ import (
 const (
 	// ContentJSON header value for JSON data.
 	ContentJSON = "application/json"
+	// ContentJSONP header value for JSONP data.
+	ContentJSONP = "application/javascript"
 	// ContentType header constant.
 	ContentType = "Content-Type"
 	// ContentDefaultCharset default character encoding.
@@ -41,6 +43,17 @@ func (enc *HTTPEncoder) EncodeJSON(model Model) error {
 	if err != nil {
 		http.Error(enc.writer, fmt.Sprintf("Unable to encode '%v' as JSON data", model), http.StatusInternalServerError)
 	}
+	return err
+}
 
+// EncodeJSONP encodes a data as jsonp
+func (enc *HTTPEncoder) EncodeJSONP(callback string, model Model) error {
+	enc.writer.Header().Set(ContentType, ContentTypeWithCharset(ContentJSONP))
+
+	data, _ := json.Marshal(model)
+	_, err := fmt.Fprintf(enc.writer, "%s(%s)", callback, string(data))
+	if err != nil {
+		http.Error(enc.writer, fmt.Sprintf("Unable to encode '%v' as JSON for javascript func %s", model, callback), http.StatusInternalServerError)
+	}
 	return err
 }

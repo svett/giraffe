@@ -29,7 +29,7 @@ var _ = Describe("HTTPEncoder", func() {
 		encoder = giraffe.NewHTTPEncoder(responseWriter)
 	})
 
-	Describe("EncodeJSON", func() {
+	Describe("JSON", func() {
 		var model map[string]string
 
 		BeforeEach(func() {
@@ -37,22 +37,41 @@ var _ = Describe("HTTPEncoder", func() {
 			model["name"] = "Unknown"
 		})
 
-		It("encodes a json format", func() {
-			Expect(encoder.EncodeJSON(model)).To(Succeed())
+		Describe("EncodeJSON", func() {
+			It("encodes a json format", func() {
+				Expect(encoder.EncodeJSON(model)).To(Succeed())
 
-			var attrib map[string]string
-			Expect(json.Unmarshal(recoder.Body.Bytes(), &attrib)).To(Succeed())
-			Expect(attrib).To(Equal(model))
+				var attrib map[string]string
+				Expect(json.Unmarshal(recoder.Body.Bytes(), &attrib)).To(Succeed())
+				Expect(attrib).To(Equal(model))
+			})
+
+			It("has the corrent content type", func() {
+				Expect(encoder.EncodeJSON(model)).To(Succeed())
+				Expect(recoder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"application/json; charset=UTF-8"}))
+			})
+
+			It("has the correct status code", func() {
+				Expect(encoder.EncodeJSON(model)).To(Succeed())
+				Expect(recoder.Code).To(Equal(http.StatusOK))
+			})
 		})
 
-		It("has the corrent content type", func() {
-			Expect(encoder.EncodeJSON(model)).To(Succeed())
-			Expect(recoder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"application/json; charset=UTF-8"}))
-		})
+		Describe("EncodeJSONP", func() {
+			It("encodes a json format", func() {
+				Expect(encoder.EncodeJSONP("my_callback", model)).To(Succeed())
+				Expect(recoder.Body.String()).To(Equal("my_callback({\"name\":\"Unknown\"})"))
+			})
 
-		It("has the correct status code", func() {
-			Expect(encoder.EncodeJSON(model)).To(Succeed())
-			Expect(recoder.Code).To(Equal(http.StatusOK))
+			It("has the corrent content type", func() {
+				Expect(encoder.EncodeJSONP("my_callback_func", model)).To(Succeed())
+				Expect(recoder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"application/javascript; charset=UTF-8"}))
+			})
+
+			It("has the correct status code", func() {
+				Expect(encoder.EncodeJSONP("my_callback_func", model)).To(Succeed())
+				Expect(recoder.Code).To(Equal(http.StatusOK))
+			})
 		})
 
 		Context("when encoding fails", func() {
@@ -65,13 +84,26 @@ var _ = Describe("HTTPEncoder", func() {
 				responseWriter = fakeResponseWriter
 			})
 
-			It("returns the error", func() {
-				Expect(encoder.EncodeJSON(model)).To(MatchError("Oh no!"))
+			Describe("EncodeJSON", func() {
+				It("returns the error", func() {
+					Expect(encoder.EncodeJSON(model)).To(MatchError("Oh no!"))
+				})
+
+				It("has correct status code", func() {
+					encoder.EncodeJSON(model)
+					Expect(fakeResponseWriter.Code()).To(Equal(http.StatusInternalServerError))
+				})
 			})
 
-			It("has correct status code", func() {
-				encoder.EncodeJSON(model)
-				Expect(fakeResponseWriter.Code()).To(Equal(http.StatusInternalServerError))
+			Describe("EncodeJSONP", func() {
+				It("returns the error", func() {
+					Expect(encoder.EncodeJSONP("my_callback_func", model)).To(MatchError("Oh no!"))
+				})
+
+				It("has correct status code", func() {
+					encoder.EncodeJSONP("my_callback_func", model)
+					Expect(fakeResponseWriter.Code()).To(Equal(http.StatusInternalServerError))
+				})
 			})
 		})
 	})
