@@ -7,6 +7,8 @@ import (
 )
 
 const (
+	// ContentBinary header value for binary data.
+	ContentBinary = "application/octet-stream"
 	// ContentJSON header value for JSON data.
 	ContentJSON = "application/json"
 	// ContentJSONP header value for JSONP data.
@@ -54,6 +56,17 @@ func (enc *HTTPEncoder) EncodeJSONP(callback string, model Model) error {
 	_, err := fmt.Fprintf(enc.writer, "%s(%s)", callback, string(data))
 	if err != nil {
 		http.Error(enc.writer, fmt.Sprintf("Unable to encode '%v' as JSON for javascript func %s", model, callback), http.StatusInternalServerError)
+	}
+	return err
+}
+
+// EncodeData encodes an array of bytes
+func (enc *HTTPEncoder) EncodeData(data []byte) error {
+	enc.writer.Header().Set(ContentType, ContentTypeWithCharset(ContentBinary))
+
+	_, err := enc.writer.Write(data)
+	if err != nil {
+		http.Error(enc.writer, "Unable to encode binary data", http.StatusInternalServerError)
 	}
 	return err
 }
