@@ -41,7 +41,7 @@ func NewHTTPEncoder(writer http.ResponseWriter) *HTTPEncoder {
 
 // EncodeJSON encodes a data as json
 func (enc *HTTPEncoder) EncodeJSON(model Model) error {
-	enc.writer.Header().Set(ContentType, ContentTypeWithCharset(ContentJSON))
+	enc.setContentType(ContentJSON)
 
 	err := json.NewEncoder(enc.writer).Encode(model)
 	if err != nil {
@@ -52,7 +52,7 @@ func (enc *HTTPEncoder) EncodeJSON(model Model) error {
 
 // EncodeJSONP encodes a data as jsonp
 func (enc *HTTPEncoder) EncodeJSONP(callback string, model Model) error {
-	enc.writer.Header().Set(ContentType, ContentTypeWithCharset(ContentJSONP))
+	enc.setContentType(ContentJSONP)
 
 	data, _ := json.Marshal(model)
 	_, err := fmt.Fprintf(enc.writer, "%s(%s)", callback, string(data))
@@ -64,7 +64,7 @@ func (enc *HTTPEncoder) EncodeJSONP(callback string, model Model) error {
 
 // EncodeData encodes an array of bytes
 func (enc *HTTPEncoder) EncodeData(data []byte) error {
-	enc.writer.Header().Set(ContentType, ContentTypeWithCharset(ContentBinary))
+	enc.setContentType(ContentBinary)
 
 	_, err := enc.writer.Write(data)
 	if err != nil {
@@ -75,11 +75,18 @@ func (enc *HTTPEncoder) EncodeData(data []byte) error {
 
 // EncodeText encodes a plain text
 func (enc *HTTPEncoder) EncodeText(text string) error {
-	enc.writer.Header().Set(ContentType, ContentTypeWithCharset(ContentText))
+	enc.setContentType(ContentText)
 
 	_, err := fmt.Fprint(enc.writer, text)
 	if err != nil {
 		http.Error(enc.writer, fmt.Sprintf("Unable to encode text '%s'", text), http.StatusInternalServerError)
 	}
 	return err
+}
+
+func (enc *HTTPEncoder) setContentType(contentType string) {
+	if enc.writer.Header().Get(ContentType) != "" {
+		return
+	}
+	enc.writer.Header().Set(ContentType, ContentTypeWithCharset(contentType))
 }

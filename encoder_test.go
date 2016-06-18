@@ -45,6 +45,15 @@ var _ = Describe("HTTPEncoder", func() {
 			Expect(recoder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"application/json; charset=UTF-8"}))
 		})
 
+		Context("when the content type is already set", func() {
+			It("does not change it", func() {
+				model := map[string]string{"name": "root"}
+				recoder.Header().Set("Content-Type", "Unknown")
+				Expect(encoder.EncodeJSON(model)).To(Succeed())
+				Expect(recoder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"Unknown"}))
+			})
+		})
+
 		It("has the correct status code", func() {
 			model := map[string]string{"name": "root"}
 			Expect(encoder.EncodeJSON(model)).To(Succeed())
@@ -65,6 +74,15 @@ var _ = Describe("HTTPEncoder", func() {
 			Expect(recoder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"application/javascript; charset=UTF-8"}))
 		})
 
+		Context("when the content type is already set", func() {
+			It("does not change it", func() {
+				model := map[string]string{"name": "root"}
+				recoder.Header().Set("Content-Type", "Unknown")
+				Expect(encoder.EncodeJSONP("my_callback_func", model)).To(Succeed())
+				Expect(recoder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"Unknown"}))
+			})
+		})
+
 		It("has the correct status code", func() {
 			model := map[string]string{"name": "root"}
 			Expect(encoder.EncodeJSONP("my_callback_func", model)).To(Succeed())
@@ -83,6 +101,14 @@ var _ = Describe("HTTPEncoder", func() {
 			Expect(recoder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"application/octet-stream; charset=UTF-8"}))
 		})
 
+		Context("when the content type is already set", func() {
+			It("does not change it", func() {
+				recoder.Header().Set("Content-Type", "Unknown")
+				Expect(encoder.EncodeData([]byte("hello"))).To(Succeed())
+				Expect(recoder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"Unknown"}))
+			})
+		})
+
 		It("has the correct status code", func() {
 			Expect(encoder.EncodeData([]byte("hello"))).To(Succeed())
 			Expect(recoder.Code).To(Equal(http.StatusOK))
@@ -98,6 +124,14 @@ var _ = Describe("HTTPEncoder", func() {
 		It("has the corrent content type", func() {
 			Expect(encoder.EncodeText("hello")).To(Succeed())
 			Expect(recoder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"text/plain; charset=UTF-8"}))
+		})
+
+		Context("when the content type is already set", func() {
+			It("does not change it", func() {
+				recoder.Header().Set("Content-Type", "Unknown")
+				Expect(encoder.EncodeText("hello")).To(Succeed())
+				Expect(recoder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"Unknown"}))
+			})
 		})
 
 		It("has the correct status code", func() {
