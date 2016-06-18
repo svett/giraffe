@@ -21,22 +21,12 @@ const (
 	ContentDefaultCharset = "UTF-8"
 )
 
-// ContentTypeWithCharset returns the contentype with the default charset
-func ContentTypeWithCharset(contentType string) string {
-	return fmt.Sprintf("%s; charset=%s", contentType, ContentDefaultCharset)
-}
-
 // Model represents a encoder data
 type Model interface{}
 
 // HTTPEncoder encodes into a different formats
 type HTTPEncoder struct {
 	writer http.ResponseWriter
-}
-
-// NewHTTPEncoder creates a new encoder for concrete writer
-func NewHTTPEncoder(writer http.ResponseWriter) *HTTPEncoder {
-	return &HTTPEncoder{writer: writer}
 }
 
 // EncodeJSON encodes a data as json
@@ -89,4 +79,14 @@ func (enc *HTTPEncoder) setContentType(contentType string) {
 		return
 	}
 	enc.writer.Header().Set(ContentType, ContentTypeWithCharset(contentType))
+}
+
+// NewHTTPEncoder creates a new encoder for concrete writer
+func NewHTTPEncoder(writer http.ResponseWriter) *HTTPEncoder {
+	return &HTTPEncoder{writer: writer}
+}
+
+// ContentTypeWithCharset returns the contentype with the default charset
+func ContentTypeWithCharset(contentType string) string {
+	return fmt.Sprintf("%s; charset=%s", contentType, ContentDefaultCharset)
 }
