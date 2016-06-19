@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/going/toolkit/log"
 )
 
 var (
@@ -35,19 +33,6 @@ type Logger interface {
 	SupportColors() bool
 	// Info writes an info message
 	Info(string)
-}
-
-// StandardLogger represents a standar logger
-type StandardLogger struct{}
-
-// SupportColors returns true for the standar logger
-func (logger *StandardLogger) SupportColors() bool {
-	return true
-}
-
-// Info writes an info msg
-func (logger *StandardLogger) Info(info string) {
-	log.Info(info)
 }
 
 // HandlerFunc is a func that handle middleware operations
