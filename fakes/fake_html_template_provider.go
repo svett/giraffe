@@ -12,7 +12,7 @@ type FakeHTMLTemplateProvider struct {
 	ProvideStub        func() (*template.Template, error)
 	provideMutex       sync.RWMutex
 	provideArgsForCall []struct{}
-	provideReturns     struct {
+	provideReturns struct {
 		result1 *template.Template
 		result2 error
 	}
