@@ -15,7 +15,7 @@ import (
 	"github.com/svett/giraffe/fakes"
 )
 
-var _ = FDescribe("HTMLTemplateRenderer", func() {
+var _ = Describe("HTMLTemplateRenderer", func() {
 	var (
 		renderer       *giraffe.HTMLTemplateRenderer
 		recorder       *httptest.ResponseRecorder
