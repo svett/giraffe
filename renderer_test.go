@@ -40,7 +40,7 @@ var _ = Describe("HTMLTemplateRenderer", func() {
 	})
 
 	JustBeforeEach(func() {
-		renderer = giraffe.NewHTMLTemplateRenderer(responseWriter, provider)
+		renderer = giraffe.NewHTMLTemplateRendererWithProvider(responseWriter, provider)
 	})
 
 	It("renders the templates", func() {
@@ -92,5 +92,16 @@ var _ = Describe("HTMLTemplateRenderer", func() {
 			renderer.Render("home", "Ben")
 			Expect(recorder.Code).To(Equal(http.StatusInternalServerError))
 		})
+	})
+})
+
+var _ = Describe("NewHTMLTemplateRenderer", func() {
+	It("creates a renderer with default provider", func() {
+		provider := new(fakes.FakeHTMLTemplateProvider)
+		provider.ProvideReturns(nil, errors.New("oh no!"))
+		giraffe.SetHTMLTemplateProvider(provider)
+		renderer := giraffe.NewHTMLTemplateRenderer(httptest.NewRecorder())
+		renderer.Render("my_template", nil)
+		Expect(provider.ProvideCallCount()).To(Equal(1))
 	})
 })

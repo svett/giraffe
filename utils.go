@@ -3,6 +3,8 @@ package giraffe
 import (
 	"fmt"
 	"net/http"
+	"path/filepath"
+	"strings"
 )
 
 const (
@@ -30,4 +32,22 @@ func setContentType(writer http.ResponseWriter, contentType string) {
 
 	contentType = fmt.Sprintf("%s; charset=%s", contentType, ContentDefaultCharset)
 	writer.Header().Set(ContentType, contentType)
+}
+
+func name(dir, ext string) string {
+	name := (dir[0 : len(dir)-len(ext)])
+	return name
+}
+
+func ext(dir, path string) (string, string, error) {
+	rel, err := filepath.Rel(dir, path)
+	if err != nil {
+		return "", "", err
+	}
+
+	ext := ""
+	if strings.Index(rel, ".") != -1 {
+		ext = filepath.Ext(rel)
+	}
+	return rel, ext, nil
 }

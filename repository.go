@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // TemplateCompilation defines the compilcation options
@@ -16,10 +15,6 @@ const (
 	CompileAlways TemplateCompilation = iota
 	// CompileOnce  enables compilation only once when the templates are used for first time
 	CompileOnce
-)
-
-var (
-	defaultRepository *HTMLTemplateRepository
 )
 
 // HTMLTemplateRepository represents a template repository
@@ -65,22 +60,4 @@ func (repository *HTMLTemplateRepository) Provide() (*template.Template, error) 
 	}
 
 	return repository.templates, nil
-}
-
-func name(dir, ext string) string {
-	name := (dir[0 : len(dir)-len(ext)])
-	return name
-}
-
-func ext(dir, path string) (string, string, error) {
-	rel, err := filepath.Rel(dir, path)
-	if err != nil {
-		return "", "", err
-	}
-
-	ext := ""
-	if strings.Index(rel, ".") != -1 {
-		ext = filepath.Ext(rel)
-	}
-	return rel, ext, nil
 }
