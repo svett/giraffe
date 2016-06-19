@@ -20,7 +20,7 @@ func (enc *HTTPEncoder) EncodeJSON(model Model) error {
 
 	err := json.NewEncoder(enc.writer).Encode(model)
 	if err != nil {
-		http.Error(enc.writer, fmt.Sprintf("Unable to encode '%v' as JSON data", model), http.StatusInternalServerError)
+		http.Error(enc.writer, fmt.Sprintf("Unable to encode '%v' as JSON data: %s", model, err.Error()), http.StatusInternalServerError)
 	}
 	return err
 }
@@ -32,7 +32,7 @@ func (enc *HTTPEncoder) EncodeJSONP(callback string, model Model) error {
 	data, _ := json.Marshal(model)
 	_, err := fmt.Fprintf(enc.writer, "%s(%s)", callback, string(data))
 	if err != nil {
-		http.Error(enc.writer, fmt.Sprintf("Unable to encode '%v' as JSON for javascript func %s", model, callback), http.StatusInternalServerError)
+		http.Error(enc.writer, fmt.Sprintf("Unable to encode '%v' as JSON for javascript func %s: %s", model, callback, err.Error()), http.StatusInternalServerError)
 	}
 	return err
 }
@@ -43,7 +43,7 @@ func (enc *HTTPEncoder) EncodeData(data []byte) error {
 
 	_, err := enc.writer.Write(data)
 	if err != nil {
-		http.Error(enc.writer, "Unable to encode binary data", http.StatusInternalServerError)
+		http.Error(enc.writer, fmt.Sprintf("Unable to encode binary data: %s", err.Error()), http.StatusInternalServerError)
 	}
 	return err
 }
@@ -54,7 +54,7 @@ func (enc *HTTPEncoder) EncodeText(text string) error {
 
 	_, err := fmt.Fprint(enc.writer, text)
 	if err != nil {
-		http.Error(enc.writer, fmt.Sprintf("Unable to encode text '%s'", text), http.StatusInternalServerError)
+		http.Error(enc.writer, fmt.Sprintf("Unable to encode text '%s': %s", text, err.Error()), http.StatusInternalServerError)
 	}
 	return err
 }
