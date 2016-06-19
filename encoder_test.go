@@ -145,7 +145,6 @@ var _ = Describe("HTTPEncoder", func() {
 
 		BeforeEach(func() {
 			fakeResponseWriter = mocks.NewFakeResponseWriter(mocks.FuncWriter(func(_ []byte) (int, error) {
-				fmt.Println("HELLO")
 				return -1, fmt.Errorf("Oh no!")
 			}))
 			responseWriter = fakeResponseWriter
