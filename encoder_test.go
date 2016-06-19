@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/svett/giraffe"
-	"github.com/svett/giraffe/mocks"
+	"github.com/svett/giraffe/fakes"
 )
 
 var _ = Describe("HTTPEncoder", func() {
@@ -141,10 +141,10 @@ var _ = Describe("HTTPEncoder", func() {
 	})
 
 	Context("when encoding fails", func() {
-		var fakeResponseWriter *mocks.FakeResponseWriter
+		var fakeResponseWriter *fakes.FakeResponseWriter
 
 		BeforeEach(func() {
-			fakeResponseWriter = mocks.NewFakeResponseWriter(mocks.FuncWriter(func(_ []byte) (int, error) {
+			fakeResponseWriter = fakes.NewFakeResponseWriter(fakes.FuncWriter(func(_ []byte) (int, error) {
 				return -1, fmt.Errorf("Oh no!")
 			}))
 			responseWriter = fakeResponseWriter

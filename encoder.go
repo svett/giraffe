@@ -6,21 +6,6 @@ import (
 	"net/http"
 )
 
-const (
-	// ContentBinary header value for binary data.
-	ContentBinary = "application/octet-stream"
-	// ContentJSON header value for JSON data.
-	ContentJSON = "application/json"
-	// ContentJSONP header value for JSONP data.
-	ContentJSONP = "application/javascript"
-	// ContentText header value for Text data.
-	ContentText = "text/plain"
-	// ContentType header constant.
-	ContentType = "Content-Type"
-	// ContentDefaultCharset default character encoding.
-	ContentDefaultCharset = "UTF-8"
-)
-
 // Model represents a encoder data
 type Model interface{}
 
@@ -31,7 +16,7 @@ type HTTPEncoder struct {
 
 // EncodeJSON encodes a data as json
 func (enc *HTTPEncoder) EncodeJSON(model Model) error {
-	enc.setContentType(ContentJSON)
+	setContentType(enc.writer, ContentJSON)
 
 	err := json.NewEncoder(enc.writer).Encode(model)
 	if err != nil {
@@ -42,7 +27,7 @@ func (enc *HTTPEncoder) EncodeJSON(model Model) error {
 
 // EncodeJSONP encodes a data as jsonp
 func (enc *HTTPEncoder) EncodeJSONP(callback string, model Model) error {
-	enc.setContentType(ContentJSONP)
+	setContentType(enc.writer, ContentJSONP)
 
 	data, _ := json.Marshal(model)
 	_, err := fmt.Fprintf(enc.writer, "%s(%s)", callback, string(data))
@@ -54,7 +39,7 @@ func (enc *HTTPEncoder) EncodeJSONP(callback string, model Model) error {
 
 // EncodeData encodes an array of bytes
 func (enc *HTTPEncoder) EncodeData(data []byte) error {
-	enc.setContentType(ContentBinary)
+	setContentType(enc.writer, ContentBinary)
 
 	_, err := enc.writer.Write(data)
 	if err != nil {
@@ -65,7 +50,7 @@ func (enc *HTTPEncoder) EncodeData(data []byte) error {
 
 // EncodeText encodes a plain text
 func (enc *HTTPEncoder) EncodeText(text string) error {
-	enc.setContentType(ContentText)
+	setContentType(enc.writer, ContentText)
 
 	_, err := fmt.Fprint(enc.writer, text)
 	if err != nil {
@@ -74,19 +59,7 @@ func (enc *HTTPEncoder) EncodeText(text string) error {
 	return err
 }
 
-func (enc *HTTPEncoder) setContentType(contentType string) {
-	if enc.writer.Header().Get(ContentType) != "" {
-		return
-	}
-	enc.writer.Header().Set(ContentType, ContentTypeWithCharset(contentType))
-}
-
 // NewHTTPEncoder creates a new encoder for concrete writer
 func NewHTTPEncoder(writer http.ResponseWriter) *HTTPEncoder {
 	return &HTTPEncoder{writer: writer}
-}
-
-// ContentTypeWithCharset returns the contentype with the default charset
-func ContentTypeWithCharset(contentType string) string {
-	return fmt.Sprintf("%s; charset=%s", contentType, ContentDefaultCharset)
 }
