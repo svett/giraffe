@@ -2,7 +2,9 @@ package giraffe
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -29,22 +31,24 @@ var (
 
 // Logger that logs information
 type Logger interface {
-	// SupportColors returns true whether the logger support colors
-	SupportColors() bool
-	// Info writes an info message
-	Info(string)
+	// Println writes an info message
+	Println(...interface{})
 }
 
 // HandlerFunc is a func that handle middleware operations
 type HandlerFunc func(w http.ResponseWriter, request *http.Request, next http.HandlerFunc)
 
-// StandardHTTPLogger creates a default HTTP Logger
-func StandardHTTPLogger() HandlerFunc {
-	return NewHTTPLogger(&StandardLogger{})
+// NewHTTPStandardLogger prints logs into the standard out
+func NewHTTPStandardLogger() HandlerFunc {
+	color := false
+	if info, err := os.Stderr.Stat(); err == nil {
+		color = (info.Mode()&os.ModeCharDevice != 0)
+	}
+	return NewHTTPLogger(log.New(os.Stderr, "HTTP", log.LstdFlags), color)
 }
 
 // NewHTTPLogger logs a HTTP requests
-func NewHTTPLogger(logger Logger) HandlerFunc {
+func NewHTTPLogger(logger Logger, color bool) HandlerFunc {
 	return func(w http.ResponseWriter, request *http.Request, next http.HandlerFunc) {
 		// Start timer
 		start := time.Now()
@@ -68,14 +72,13 @@ func NewHTTPLogger(logger Logger) HandlerFunc {
 			resetColor  string
 		)
 
-		if logger.SupportColors() {
+		if color {
 			statusColor = colorForStatus(statusCode)
 			methodColor = colorForMethod(method)
 			resetColor = DefaultColor
 		}
 
-		msg := fmt.Sprintf("%v |%s %3d %s| %13v | %s |%s  %s %-7s %s",
-			end.Format("2006/01/02 - 15:04:05"),
+		msg := fmt.Sprintf("%s %3d %s| %13v | %s |%s  %s %-7s %s",
 			statusColor, statusCode, resetColor,
 			latency,
 			clientIP,
@@ -83,7 +86,7 @@ func NewHTTPLogger(logger Logger) HandlerFunc {
 			path,
 		)
 
-		logger.Info(msg)
+		logger.Println(msg)
 	}
 }
 

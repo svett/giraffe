@@ -3,7 +3,6 @@ package giraffe_test
 import (
 	"net/http"
 	"net/http/httptest"
-	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,7 +21,7 @@ var _ = Describe("HTTPLogger", func() {
 
 	BeforeEach(func() {
 		logger = new(fakes.FakeLogger)
-		logHandler = giraffe.NewHTTPLogger(logger)
+		logHandler = giraffe.NewHTTPLogger(logger, false)
 		Expect(logHandler).NotTo(BeNil())
 
 		writer = httptest.NewRecorder()
@@ -49,10 +48,9 @@ var _ = Describe("HTTPLogger", func() {
 			w.WriteHeader(http.StatusOK)
 		})
 
-		Expect(logger.InfoCallCount()).To(Equal(1))
-		msg := logger.InfoArgsForCall(0)
+		Expect(logger.PrintlnCallCount()).To(Equal(1))
+		msg := logger.PrintlnArgsForCall(0)[0].(string)
 
-		Expect(msg).To(ContainSubstring(time.Now().Format("2006/01/02")))
 		Expect(msg).To(ContainSubstring("200"))
 		Expect(msg).To(ContainSubstring("GET"))
 		Expect(msg).To(ContainSubstring("/foo"))

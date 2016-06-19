@@ -8,64 +8,34 @@ import (
 )
 
 type FakeLogger struct {
-	SupportColorsStub        func() bool
-	supportColorsMutex       sync.RWMutex
-	supportColorsArgsForCall []struct{}
-	supportColorsReturns struct {
-		result1 bool
-	}
-	InfoStub        func(string)
-	infoMutex       sync.RWMutex
-	infoArgsForCall []struct {
-		arg1 string
+	PrintlnStub        func(...interface{})
+	printlnMutex       sync.RWMutex
+	printlnArgsForCall []struct {
+		arg1 []interface{}
 	}
 }
 
-func (fake *FakeLogger) SupportColors() bool {
-	fake.supportColorsMutex.Lock()
-	fake.supportColorsArgsForCall = append(fake.supportColorsArgsForCall, struct{}{})
-	fake.supportColorsMutex.Unlock()
-	if fake.SupportColorsStub != nil {
-		return fake.SupportColorsStub()
-	} else {
-		return fake.supportColorsReturns.result1
-	}
-}
-
-func (fake *FakeLogger) SupportColorsCallCount() int {
-	fake.supportColorsMutex.RLock()
-	defer fake.supportColorsMutex.RUnlock()
-	return len(fake.supportColorsArgsForCall)
-}
-
-func (fake *FakeLogger) SupportColorsReturns(result1 bool) {
-	fake.SupportColorsStub = nil
-	fake.supportColorsReturns = struct {
-		result1 bool
-	}{result1}
-}
-
-func (fake *FakeLogger) Info(arg1 string) {
-	fake.infoMutex.Lock()
-	fake.infoArgsForCall = append(fake.infoArgsForCall, struct {
-		arg1 string
+func (fake *FakeLogger) Println(arg1 ...interface{}) {
+	fake.printlnMutex.Lock()
+	fake.printlnArgsForCall = append(fake.printlnArgsForCall, struct {
+		arg1 []interface{}
 	}{arg1})
-	fake.infoMutex.Unlock()
-	if fake.InfoStub != nil {
-		fake.InfoStub(arg1)
+	fake.printlnMutex.Unlock()
+	if fake.PrintlnStub != nil {
+		fake.PrintlnStub(arg1...)
 	}
 }
 
-func (fake *FakeLogger) InfoCallCount() int {
-	fake.infoMutex.RLock()
-	defer fake.infoMutex.RUnlock()
-	return len(fake.infoArgsForCall)
+func (fake *FakeLogger) PrintlnCallCount() int {
+	fake.printlnMutex.RLock()
+	defer fake.printlnMutex.RUnlock()
+	return len(fake.printlnArgsForCall)
 }
 
-func (fake *FakeLogger) InfoArgsForCall(i int) string {
-	fake.infoMutex.RLock()
-	defer fake.infoMutex.RUnlock()
-	return fake.infoArgsForCall[i].arg1
+func (fake *FakeLogger) PrintlnArgsForCall(i int) []interface{} {
+	fake.printlnMutex.RLock()
+	defer fake.printlnMutex.RUnlock()
+	return fake.printlnArgsForCall[i].arg1
 }
 
 var _ giraffe.Logger = new(FakeLogger)
