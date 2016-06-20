@@ -43,13 +43,7 @@ encoder.EncodeText("Hello World")
 You can render HTML templates:
 
 ```Go
-repository := &giraffe.HTMLTemplateRepository{
- Directory: "assets",
- FileExtension: ".tmpl",
- Compilation: giraffe.CompileOnce,
-}
-
-renderer := giraffe.NewHTMLTemplateRenderer(responseWriter, repository)
+renderer := giraffe.NewHTMLTemplateRenderer(responseWriter)
 renderer.Render("my_template", "Jack")
 ```
 
