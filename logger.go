@@ -44,7 +44,7 @@ func NewHTTPStandardLogger() HandlerFunc {
 	if info, err := os.Stderr.Stat(); err == nil {
 		color = (info.Mode()&os.ModeCharDevice != 0)
 	}
-	return NewHTTPLogger(log.New(os.Stderr, "HTTP", log.LstdFlags), color)
+	return NewHTTPLogger(log.New(os.Stdout, "HTTP ", log.LstdFlags), color)
 }
 
 // NewHTTPLogger logs a HTTP requests
