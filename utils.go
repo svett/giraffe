@@ -16,8 +16,8 @@ const (
 	ContentJSONP = "application/javascript"
 	// ContentText header value for Text data.
 	ContentText = "text/plain"
-	// ContentXHTML header value for XHTML data.
-	ContentXHTML = "application/xhtml+xml"
+	// ContentHTML header value for HTML data.
+	ContentHTML = "text/html"
 
 	// ContentType header constant.
 	ContentType = "Content-Type"

@@ -51,7 +51,7 @@ var _ = Describe("HTMLTemplateRenderer", func() {
 
 	It("has the corrent content type", func() {
 		Expect(renderer.Render("home", "Ben")).To(Succeed())
-		Expect(recorder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"application/xhtml+xml; charset=UTF-8"}))
+		Expect(recorder.HeaderMap).To(HaveKeyWithValue("Content-Type", []string{"text/html; charset=UTF-8"}))
 	})
 
 	It("has the correct status code", func() {

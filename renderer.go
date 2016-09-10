@@ -40,7 +40,7 @@ func (renderer *HTMLTemplateRenderer) Render(template string, model Model) error
 		renderer.errorf(template, err)
 		return err
 	}
-	setContentType(renderer.writer, ContentXHTML)
+	setContentType(renderer.writer, ContentHTML)
 	err = templates.ExecuteTemplate(renderer.writer, template, model)
 	if err != nil {
 		renderer.errorf(template, err)
